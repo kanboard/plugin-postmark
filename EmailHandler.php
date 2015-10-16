@@ -5,6 +5,8 @@ namespace Kanboard\Plugin\Postmark;
 use Kanboard\Core\Base;
 use Kanboard\Core\Mail\ClientInterface;
 
+defined('POSTMARK_API_TOKEN') or define('POSTMARK_API_TOKEN', '');
+
 /**
  * Postmark Mail Handler
  *

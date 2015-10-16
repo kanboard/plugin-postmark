@@ -5,8 +5,6 @@ namespace Kanboard\Plugin\Postmark;
 use Kanboard\Core\Translator;
 use Kanboard\Core\Plugin\Base;
 
-defined('POSTMARK_API_TOKEN') or define('POSTMARK_API_TOKEN', '');
-
 /**
  * Postmark Plugin
  *
