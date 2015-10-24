@@ -46,7 +46,7 @@ The Kanboard webhook url is displayed in **Settings > Integrations > Postmark**
 2. Assign a project identifier to the desired projects: **Project settings > Edit**
 3. Try to send an email to your project: something+myproject@mydomain.tld
 
-The sender email address must same as the user profile in Kanboard. The user must be member of the project.
+The sender email address must be same as the user profile in Kanboard and the user must be member of the project.
 
 Troubleshootings
 ----------------
