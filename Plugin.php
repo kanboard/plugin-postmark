@@ -18,7 +18,7 @@ class Plugin extends Base
         $this->emailClient->setTransport('postmark', '\Kanboard\Plugin\Postmark\EmailHandler');
         $this->template->hook->attach('template:config:integrations', 'postmark:integration');
 
-        $this->on('session.bootstrap', function($container) {
+        $this->on('app.bootstrap', function($container) {
             Translator::load($container['config']->getCurrentLanguage(), __DIR__.'/Locale');
         });
     }
