@@ -2,8 +2,11 @@
 
 namespace Kanboard\Plugin\Postmark;
 
+require_once __DIR__.'/vendor/autoload.php';
+
 use Kanboard\Core\Base;
 use Kanboard\Core\Mail\ClientInterface;
+use League\HTMLToMarkdown\HtmlConverter;
 
 defined('POSTMARK_API_TOKEN') or define('POSTMARK_API_TOKEN', '');
 
@@ -79,7 +82,8 @@ class EmailHandler extends Base implements ClientInterface
 
         // Get the Markdown contents
         if (! empty($payload['HtmlBody'])) {
-            $description = $this->htmlConverter->convert($payload['HtmlBody']);
+            $htmlConverter = new HtmlConverter(array('strip_tags' => true));
+            $description = $htmlConverter->convert($payload['HtmlBody']);
         }
         else if (! empty($payload['TextBody'])) {
             $description = $payload['TextBody'];

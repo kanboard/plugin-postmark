@@ -6,8 +6,9 @@ use Kanboard\Plugin\Postmark\EmailHandler;
 use Kanboard\Model\TaskCreation;
 use Kanboard\Model\TaskFinder;
 use Kanboard\Model\Project;
-use Kanboard\Model\ProjectPermission;
+use Kanboard\Model\ProjectUserRole;
 use Kanboard\Model\User;
+use Kanboard\Core\Security\Role;
 
 class EmailHandlerTest extends Base
 {
@@ -38,7 +39,7 @@ class EmailHandlerTest extends Base
     {
         $w = new EmailHandler($this->container);
         $p = new Project($this->container);
-        $pp = new ProjectPermission($this->container);
+        $pp = new ProjectUserRole($this->container);
         $u = new User($this->container);
         $tc = new TaskCreation($this->container);
         $tf = new TaskFinder($this->container);
@@ -59,7 +60,7 @@ class EmailHandlerTest extends Base
 
         // User is not member
         $this->assertFalse($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'MailboxHash' => 'test1', 'TextBody' => 'boo')));
-        $this->assertTrue($pp->addMember(2, 2));
+        $this->assertTrue($pp->addUser(2, 2, Role::PROJECT_MEMBER));
 
         // The task must be created
         $this->assertTrue($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'MailboxHash' => 'test1', 'TextBody' => 'boo')));
@@ -76,14 +77,14 @@ class EmailHandlerTest extends Base
     {
         $w = new EmailHandler($this->container);
         $p = new Project($this->container);
-        $pp = new ProjectPermission($this->container);
+        $pp = new ProjectUserRole($this->container);
         $u = new User($this->container);
         $tc = new TaskCreation($this->container);
         $tf = new TaskFinder($this->container);
 
         $this->assertEquals(2, $u->create(array('username' => 'me', 'email' => 'me@localhost')));
         $this->assertEquals(1, $p->create(array('name' => 'test2', 'identifier' => 'TEST1')));
-        $this->assertTrue($pp->addMember(1, 2));
+        $this->assertTrue($pp->addUser(1, 2, Role::PROJECT_MEMBER));
 
         $this->assertTrue($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'MailboxHash' => 'test1', 'TextBody' => 'boo', 'HtmlBody' => '<p><strong>boo</strong></p>')));
 
