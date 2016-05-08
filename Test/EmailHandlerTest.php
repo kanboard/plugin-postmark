@@ -3,7 +3,6 @@
 require_once 'tests/units/Base.php';
 
 use Kanboard\Plugin\Postmark\EmailHandler;
-use Kanboard\Model\TaskCreation;
 use Kanboard\Model\TaskFinder;
 use Kanboard\Model\Project;
 use Kanboard\Model\ProjectUserRole;
@@ -14,25 +13,17 @@ class EmailHandlerTest extends Base
 {
     public function testSendEmail()
     {
+        $this->container['httpClient']
+            ->expects($this->once())
+            ->method('postJson')
+            ->with(
+                'https://api.postmarkapp.com/email',
+                $this->anything(),
+                $this->anything()
+            );
+
         $pm = new EmailHandler($this->container);
         $pm->sendEmail('test@localhost', 'Me', 'Test', 'Content', 'Bob');
-
-        $this->assertEquals('https://api.postmarkapp.com/email', $this->container['httpClient']->getUrl());
-
-        $data = $this->container['httpClient']->getData();
-
-        $this->assertArrayHasKey('From', $data);
-        $this->assertArrayHasKey('To', $data);
-        $this->assertArrayHasKey('Subject', $data);
-        $this->assertArrayHasKey('HtmlBody', $data);
-
-        $this->assertEquals('Me <test@localhost>', $data['To']);
-        $this->assertEquals('Bob <notifications@kanboard.local>', $data['From']);
-        $this->assertEquals('Test', $data['Subject']);
-        $this->assertEquals('Content', $data['HtmlBody']);
-
-        $this->assertContains('Accept: application/json', $this->container['httpClient']->getHeaders());
-        $this->assertContains('X-Postmark-Server-Token: ', $this->container['httpClient']->getHeaders());
     }
 
     public function testHandlePayload()
@@ -41,7 +32,6 @@ class EmailHandlerTest extends Base
         $p = new Project($this->container);
         $pp = new ProjectUserRole($this->container);
         $u = new User($this->container);
-        $tc = new TaskCreation($this->container);
         $tf = new TaskFinder($this->container);
 
         $this->assertEquals(2, $u->create(array('username' => 'me', 'email' => 'me@localhost')));
@@ -79,7 +69,6 @@ class EmailHandlerTest extends Base
         $p = new Project($this->container);
         $pp = new ProjectUserRole($this->container);
         $u = new User($this->container);
-        $tc = new TaskCreation($this->container);
         $tf = new TaskFinder($this->container);
 
         $this->assertEquals(2, $u->create(array('username' => 'me', 'email' => 'me@localhost')));
