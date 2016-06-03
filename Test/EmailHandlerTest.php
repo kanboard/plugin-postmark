@@ -3,10 +3,10 @@
 require_once 'tests/units/Base.php';
 
 use Kanboard\Plugin\Postmark\EmailHandler;
-use Kanboard\Model\TaskFinder;
-use Kanboard\Model\Project;
-use Kanboard\Model\ProjectUserRole;
-use Kanboard\Model\User;
+use Kanboard\Model\TaskFinderModel;
+use Kanboard\Model\ProjectModel;
+use Kanboard\Model\ProjectUserRoleModel;
+use Kanboard\Model\UserModel;
 use Kanboard\Core\Security\Role;
 
 class EmailHandlerTest extends Base
@@ -29,10 +29,10 @@ class EmailHandlerTest extends Base
     public function testHandlePayload()
     {
         $w = new EmailHandler($this->container);
-        $p = new Project($this->container);
-        $pp = new ProjectUserRole($this->container);
-        $u = new User($this->container);
-        $tf = new TaskFinder($this->container);
+        $p = new ProjectModel($this->container);
+        $pp = new ProjectUserRoleModel($this->container);
+        $u = new UserModel($this->container);
+        $tf = new TaskFinderModel($this->container);
 
         $this->assertEquals(2, $u->create(array('username' => 'me', 'email' => 'me@localhost')));
 
@@ -45,10 +45,10 @@ class EmailHandlerTest extends Base
         // Unknown user
         $this->assertFalse($w->receiveEmail(array('From' => 'a@b.c', 'Subject' => 'Email task', 'MailboxHash' => 'foobar', 'TextBody' => 'boo')));
 
-        // Project not found
+        // ProjectModel not found
         $this->assertFalse($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'MailboxHash' => 'test', 'TextBody' => 'boo')));
 
-        // User is not member
+        // UserModel is not member
         $this->assertFalse($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'MailboxHash' => 'test1', 'TextBody' => 'boo')));
         $this->assertTrue($pp->addUser(2, 2, Role::PROJECT_MEMBER));
 
@@ -66,10 +66,10 @@ class EmailHandlerTest extends Base
     public function testHtml2Markdown()
     {
         $w = new EmailHandler($this->container);
-        $p = new Project($this->container);
-        $pp = new ProjectUserRole($this->container);
-        $u = new User($this->container);
-        $tf = new TaskFinder($this->container);
+        $p = new ProjectModel($this->container);
+        $pp = new ProjectUserRoleModel($this->container);
+        $u = new UserModel($this->container);
+        $tf = new TaskFinderModel($this->container);
 
         $this->assertEquals(2, $u->create(array('username' => 'me', 'email' => 'me@localhost')));
         $this->assertEquals(1, $p->create(array('name' => 'test2', 'identifier' => 'TEST1')));

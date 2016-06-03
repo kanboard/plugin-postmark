@@ -8,8 +8,6 @@ use Kanboard\Core\Base;
 use Kanboard\Core\Mail\ClientInterface;
 use League\HTMLToMarkdown\HtmlConverter;
 
-defined('POSTMARK_API_TOKEN') or define('POSTMARK_API_TOKEN', '');
-
 /**
  * Postmark Mail Handler
  *
@@ -32,11 +30,11 @@ class EmailHandler extends Base implements ClientInterface
     {
         $headers = array(
             'Accept: application/json',
-            'X-Postmark-Server-Token: '.POSTMARK_API_TOKEN,
+            'X-Postmark-Server-Token: '.$this->getApiToken(),
         );
 
         $payload = array(
-            'From' => sprintf('%s <%s>', $author, MAIL_FROM),
+            'From' => sprintf('%s <%s>', $author, $this->helper->mail->getMailSenderAddress()),
             'To' => sprintf('%s <%s>', $name, $email),
             'Subject' => $subject,
             'HtmlBody' => $html,
@@ -59,7 +57,7 @@ class EmailHandler extends Base implements ClientInterface
         }
 
         // The user must exists in Kanboard
-        $user = $this->user->getByEmail($payload['From']);
+        $user = $this->userModel->getByEmail($payload['From']);
 
         if (empty($user)) {
             $this->logger->debug('Postmark: ignored => user not found');
@@ -67,7 +65,7 @@ class EmailHandler extends Base implements ClientInterface
         }
 
         // The project must have a short name
-        $project = $this->project->getByIdentifier($payload['MailboxHash']);
+        $project = $this->projectModel->getByIdentifier($payload['MailboxHash']);
 
         if (empty($project)) {
             $this->logger->debug('Postmark: ignored => project not found');
@@ -75,29 +73,50 @@ class EmailHandler extends Base implements ClientInterface
         }
 
         // The user must be member of the project
-        if (! $this->projectPermission->isMember($project['id'], $user['id'])) {
+        if (! $this->projectPermissionModel->isMember($project['id'], $user['id'])) {
             $this->logger->debug('Postmark: ignored => user is not member of the project');
             return false;
         }
 
-        // Get the Markdown contents
-        if (! empty($payload['HtmlBody'])) {
-            $htmlConverter = new HtmlConverter(array('strip_tags' => true));
-            $description = $htmlConverter->convert($payload['HtmlBody']);
-        }
-        else if (! empty($payload['TextBody'])) {
-            $description = $payload['TextBody'];
-        }
-        else {
-            $description = '';
-        }
-
         // Finally, we create the task
-        return (bool) $this->taskCreation->create(array(
+        return (bool) $this->taskCreationModel->create(array(
             'project_id' => $project['id'],
-            'title' => $payload['Subject'],
-            'description' => $description,
+            'title' => $this->helper->mail->filterSubject($payload['Subject']),
+            'description' => $this->getTaskDescription($payload),
             'creator_id' => $user['id'],
         ));
+    }
+
+    /**
+     * @param array $payload
+     * @return array
+     */
+    protected function getTaskDescription(array $payload)
+    {
+        $description = '';
+
+        if (!empty($payload['HtmlBody'])) {
+            $htmlConverter = new HtmlConverter(array('strip_tags' => true));
+            $description = $htmlConverter->convert($payload['HtmlBody']);
+        } elseif (!empty($payload['TextBody'])) {
+            $description = $payload['TextBody'];
+        }
+
+        return $description;
+    }
+
+    /**
+     * Get API token
+     *
+     * @access public
+     * @return string
+     */
+    public function getApiToken()
+    {
+        if (defined('POSTMARK_API_TOKEN')) {
+            return POSTMARK_API_TOKEN;
+        }
+
+        return $this->configModel->get('postmark_api_token');
     }
 }

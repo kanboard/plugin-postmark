@@ -2,7 +2,7 @@
 
 namespace Kanboard\Plugin\Postmark\Controller;
 
-use Kanboard\Controller\Base;
+use Kanboard\Controller\BaseController;
 use Kanboard\Plugin\Postmark\EmailHandler;
 
 /**
@@ -11,7 +11,7 @@ use Kanboard\Plugin\Postmark\EmailHandler;
  * @package  postmark
  * @author   Frederic Guillot
  */
-class Webhook extends Base
+class WebhookController extends BaseController
 {
     /**
      * Handle Postmark webhooks
@@ -23,6 +23,6 @@ class Webhook extends Base
         $this->checkWebhookToken();
 
         $handler = new EmailHandler($this->container);
-        echo $handler->receiveEmail($this->request->getJson()) ? 'PARSED' : 'IGNORED';
+        $this->response->text($handler->receiveEmail($this->request->getJson()) ? 'PARSED' : 'IGNORED');
     }
 }
