@@ -15,7 +15,7 @@ class EmailHandlerTest extends Base
     {
         $this->container['httpClient']
             ->expects($this->once())
-            ->method('postJson')
+            ->method('postJsonAsync')
             ->with(
                 'https://api.postmarkapp.com/email',
                 $this->anything(),
