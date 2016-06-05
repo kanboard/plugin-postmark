@@ -40,7 +40,7 @@ class EmailHandler extends Base implements ClientInterface
             'HtmlBody' => $html,
         );
 
-        $this->httpClient->postJson('https://api.postmarkapp.com/email', $payload, $headers);
+        $this->httpClient->postJsonAsync('https://api.postmarkapp.com/email', $payload, $headers);
     }
 
     /**
