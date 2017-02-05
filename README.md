@@ -6,7 +6,7 @@ Postmark plugin for Kanboard
 Use [Postmark](https://postmarkapp.com/) to create tasks directly by email or to send notifications.
 
 - Send emails through Postmark API
-- Create tasks from incoming emails
+- Create tasks and attachments from incoming emails
 
 Author
 ------
@@ -31,10 +31,10 @@ You have the choice between 3 methods:
 
 Note: Plugin folder is case-sensitive.
 
-Kanboard configuration
+Kanboard Configuration
 ----------------------
 
-There are two different ways to configure this plugin: with the user interface or with the custom config file.
+You can configure this plugin through the user interface or with the custom config file.
 
 ### Configuration via the user interface
 
@@ -42,7 +42,7 @@ Go to **Settings > Integrations > Postmark**:
 
 ![Postmark](https://cloud.githubusercontent.com/assets/323546/15765659/519ef59a-2905-11e6-9caf-1d579e5111ca.png)
 
-### Configuration via the config file
+### Configuration via the config file (alternative method)
 
 Define those constants in your `config.php` file to send notifications with Postmark:
 
@@ -63,13 +63,11 @@ Use Postmark to create tasks from emails
 Just follow the [official documentation about inbound email processing](http://developer.postmarkapp.com/developer-process-configure.html).
 Basically, you have to forward your own domain or subdomain to a specific Postmark email address.
 
-The Kanboard webhook url is displayed in **Settings > Integrations > Postmark**
+The Postmark webhook URL is visible in **Application Settings > Integrations > Postmark**
 
-1. Be sure that your users have an email address in their profiles
-2. Assign a project identifier to the desired projects: **Project settings > Edit**
-3. Try to send an email to your project: something+myproject@mydomain.tld
-
-The sender email address must be same as the user profile in Kanboard and the user must be member of the project.
+1. The sender email address must be same as the user profile in Kanboard and the user must be member of the project
+2. Set a project email address in **Project Settings > Edit Project**
+3. Send an email to your project
 
 Troubleshooting
 ---------------
@@ -83,3 +81,5 @@ Changes
 
 - Use project email address instead of project identifier
 - Create task in first active swimlane
+- Add email body as task attachment
+- Handle email attachments

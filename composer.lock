@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "372f422cb2c8c30f53250b0ef1554618",
-    "content-hash": "ca0f97f19bce1da0c868f45014cc2c22",
+    "hash": "b76a3de5792df085274b0ec51ce13b3c",
+    "content-hash": "575b5d0195fa56d7246c197b6bf8eda3",
     "packages": [
         {
             "name": "league/html-to-markdown",
-            "version": "4.1.1",
+            "version": "4.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/html-to-markdown.git",
-                "reference": "01bbfe039d9b97526e3f3a3ee32543fc1d8dba00"
+                "reference": "13bd919efe19577084d73d14f8733244128eeaba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/html-to-markdown/zipball/01bbfe039d9b97526e3f3a3ee32543fc1d8dba00",
-                "reference": "01bbfe039d9b97526e3f3a3ee32543fc1d8dba00",
+                "url": "https://api.github.com/repos/thephpleague/html-to-markdown/zipball/13bd919efe19577084d73d14f8733244128eeaba",
+                "reference": "13bd919efe19577084d73d14f8733244128eeaba",
                 "shasum": ""
             },
             "require": {
@@ -37,7 +37,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.2-dev"
+                    "dev-master": "4.5-dev"
                 }
             },
             "autoload": {
@@ -69,7 +69,7 @@
                 "html",
                 "markdown"
             ],
-            "time": "2015-11-20 16:20:25"
+            "time": "2016-12-28 22:51:42"
         }
     ],
     "packages-dev": [],

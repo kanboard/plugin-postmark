@@ -17,6 +17,21 @@ use League\HTMLToMarkdown\HtmlConverter;
 class EmailHandler extends Base implements ClientInterface
 {
     /**
+     * Get API token
+     *
+     * @access public
+     * @return string
+     */
+    public function getApiToken()
+    {
+        if (defined('POSTMARK_API_TOKEN')) {
+            return POSTMARK_API_TOKEN;
+        }
+
+        return $this->configModel->get('postmark_api_token');
+    }
+
+    /**
      * Send a HTML email
      *
      * @access public
@@ -79,13 +94,21 @@ class EmailHandler extends Base implements ClientInterface
         }
 
         // Finally, we create the task
-        return (bool) $this->taskCreationModel->create(array(
+        $taskId = $this->taskCreationModel->create(array(
             'project_id'  => $project['id'],
             'title'       => $this->helper->mail->filterSubject($payload['Subject']),
             'description' => $this->getTaskDescription($payload),
             'creator_id'  => $user['id'],
             'swimlane_id' => $this->getSwimlaneId($project),
         ));
+
+        if ($taskId > 0) {
+            $this->addEmailBodyAsAttachment($taskId, $payload);
+            $this->uploadAttachments($taskId, $payload);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -101,36 +124,50 @@ class EmailHandler extends Base implements ClientInterface
         return empty($swimlane) ? 0 : $swimlane['id'];
     }
 
-    /**
-     * @param array $payload
-     * @return array
-     */
     protected function getTaskDescription(array $payload)
     {
-        $description = '';
+        if (! empty($payload['HtmlBody'])) {
+            $htmlConverter = new HtmlConverter(array(
+                'strip_tags'   => true,
+                'remove_nodes' => 'meta script style link img span',
+            ));
 
-        if (!empty($payload['HtmlBody'])) {
-            $htmlConverter = new HtmlConverter(array('strip_tags' => true));
-            $description = $htmlConverter->convert($payload['HtmlBody']);
-        } elseif (!empty($payload['TextBody'])) {
-            $description = $payload['TextBody'];
+            $markdown = $htmlConverter->convert($payload['HtmlBody']);
+
+            // Document parsed incorrectly
+            if (strpos($markdown, 'html') !== false && ! empty($payload['TextBody'])) {
+                return $payload['TextBody'];
+            }
+
+            return $markdown;
+        } elseif (! empty($payload['TextBody'])) {
+            return $payload['TextBody'];
         }
 
-        return $description;
+        return '';
     }
 
-    /**
-     * Get API token
-     *
-     * @access public
-     * @return string
-     */
-    public function getApiToken()
+    protected function addEmailBodyAsAttachment($taskId, array $payload)
     {
-        if (defined('POSTMARK_API_TOKEN')) {
-            return POSTMARK_API_TOKEN;
+        $filename = t('Email') . '.txt';
+        $data = '';
+
+        if (! empty($payload['HtmlBody'])) {
+            $data = $payload['HtmlBody'];
+            $filename = t('Email') . '.html';
+        } elseif (! empty($payload['TextBody'])) {
+            $data = $payload['TextBody'];
         }
 
-        return $this->configModel->get('postmark_api_token');
+        if (! empty($data)) {
+            $this->taskFileModel->uploadContent($taskId, $filename, $data, false);
+        }
+    }
+
+    protected function uploadAttachments($taskId, array $payload)
+    {
+        foreach ($payload['Attachments'] as $attachment) {
+            $this->taskFileModel->uploadContent($taskId, $attachment['Name'], $attachment['Content']);
+        }
     }
 }
