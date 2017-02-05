@@ -80,11 +80,25 @@ class EmailHandler extends Base implements ClientInterface
 
         // Finally, we create the task
         return (bool) $this->taskCreationModel->create(array(
-            'project_id' => $project['id'],
-            'title' => $this->helper->mail->filterSubject($payload['Subject']),
+            'project_id'  => $project['id'],
+            'title'       => $this->helper->mail->filterSubject($payload['Subject']),
             'description' => $this->getTaskDescription($payload),
-            'creator_id' => $user['id'],
+            'creator_id'  => $user['id'],
+            'swimlane_id' => $this->getSwimlaneId($project),
         ));
+    }
+
+    /**
+     * Get swimlane id
+     *
+     * @access protected
+     * @param  array $project
+     * @return string
+     */
+    protected function getSwimlaneId(array $project)
+    {
+        $swimlane = $this->swimlaneModel->getFirstActiveSwimlane($project['id']);
+        return empty($swimlane) ? 0 : $swimlane['id'];
     }
 
     /**

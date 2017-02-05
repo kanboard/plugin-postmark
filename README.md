@@ -82,3 +82,4 @@ Changes
 ### Version 1.0.7
 
 - Use project email address instead of project identifier
+- Create task in first active swimlane
