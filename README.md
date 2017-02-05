@@ -17,7 +17,7 @@ Author
 Requirements
 ------------
 
-- Kanboard >= 1.0.37
+- Kanboard >= 1.0.39
 - Postmark API credentials
 
 Installation
@@ -75,3 +75,10 @@ Troubleshooting
 ---------------
 
 - Test the webhook url from the Postmark console, you should have a status code `200 OK`
+
+Changes
+-------
+
+### Version 1.0.7
+
+- Use project email address instead of project identifier

@@ -37,23 +37,23 @@ class EmailHandlerTest extends Base
         $this->assertEquals(2, $u->create(array('username' => 'me', 'email' => 'me@localhost')));
 
         $this->assertEquals(1, $p->create(array('name' => 'test1')));
-        $this->assertEquals(2, $p->create(array('name' => 'test2', 'identifier' => 'TEST1')));
+        $this->assertEquals(2, $p->create(array('name' => 'test2', 'email' => 'project@localhost')));
 
         // Empty payload
         $this->assertFalse($w->receiveEmail(array()));
 
         // Unknown user
-        $this->assertFalse($w->receiveEmail(array('From' => 'a@b.c', 'Subject' => 'Email task', 'MailboxHash' => 'foobar', 'TextBody' => 'boo')));
+        $this->assertFalse($w->receiveEmail(array('From' => 'a@b.c', 'Subject' => 'Email task', 'To' => 'project@localhost', 'TextBody' => 'boo')));
 
-        // ProjectModel not found
-        $this->assertFalse($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'MailboxHash' => 'test', 'TextBody' => 'boo')));
+        // Project not found
+        $this->assertFalse($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'To' => 'unknown@localhost', 'TextBody' => 'boo')));
 
-        // UserModel is not member
-        $this->assertFalse($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'MailboxHash' => 'test1', 'TextBody' => 'boo')));
+        // User is not member
+        $this->assertFalse($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'To' => 'project@localhost', 'TextBody' => 'boo')));
         $this->assertTrue($pp->addUser(2, 2, Role::PROJECT_MEMBER));
 
         // The task must be created
-        $this->assertTrue($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'MailboxHash' => 'test1', 'TextBody' => 'boo')));
+        $this->assertTrue($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'To' => 'project@localhost', 'TextBody' => 'boo')));
 
         $task = $tf->getById(1);
         $this->assertNotEmpty($task);
@@ -72,10 +72,10 @@ class EmailHandlerTest extends Base
         $tf = new TaskFinderModel($this->container);
 
         $this->assertEquals(2, $u->create(array('username' => 'me', 'email' => 'me@localhost')));
-        $this->assertEquals(1, $p->create(array('name' => 'test2', 'identifier' => 'TEST1')));
+        $this->assertEquals(1, $p->create(array('name' => 'test2', 'email' => 'project@localhost')));
         $this->assertTrue($pp->addUser(1, 2, Role::PROJECT_MEMBER));
 
-        $this->assertTrue($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'MailboxHash' => 'test1', 'TextBody' => 'boo', 'HtmlBody' => '<p><strong>boo</strong></p>')));
+        $this->assertTrue($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'To' => 'project@localhost', 'TextBody' => 'boo', 'HtmlBody' => '<p><strong>boo</strong></p>')));
 
         $task = $tf->getById(1);
         $this->assertNotEmpty($task);
@@ -84,7 +84,7 @@ class EmailHandlerTest extends Base
         $this->assertEquals('**boo**', $task['description']);
         $this->assertEquals(2, $task['creator_id']);
 
-        $this->assertTrue($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'MailboxHash' => 'test1', 'TextBody' => '**boo**', 'HtmlBody' => '')));
+        $this->assertTrue($w->receiveEmail(array('From' => 'me@localhost', 'Subject' => 'Email task', 'To' => 'project@localhost', 'TextBody' => '**boo**', 'HtmlBody' => '')));
 
         $task = $tf->getById(2);
         $this->assertNotEmpty($task);

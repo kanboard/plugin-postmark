@@ -52,7 +52,7 @@ class EmailHandler extends Base implements ClientInterface
      */
     public function receiveEmail(array $payload)
     {
-        if (empty($payload['From']) || empty($payload['Subject']) || empty($payload['MailboxHash'])) {
+        if (empty($payload['From']) || empty($payload['Subject']) || empty($payload['To'])) {
             return false;
         }
 
@@ -65,7 +65,7 @@ class EmailHandler extends Base implements ClientInterface
         }
 
         // The project must have a short name
-        $project = $this->projectModel->getByIdentifier($payload['MailboxHash']);
+        $project = $this->projectModel->getByEmail($payload['To']);
 
         if (empty($project)) {
             $this->logger->debug('Postmark: ignored => project not found');
@@ -73,7 +73,7 @@ class EmailHandler extends Base implements ClientInterface
         }
 
         // The user must be member of the project
-        if (! $this->projectPermissionModel->isMember($project['id'], $user['id'])) {
+        if (! $this->projectPermissionModel->isAssignable($project['id'], $user['id'])) {
             $this->logger->debug('Postmark: ignored => user is not member of the project');
             return false;
         }
