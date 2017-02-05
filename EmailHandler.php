@@ -166,8 +166,10 @@ class EmailHandler extends Base implements ClientInterface
 
     protected function uploadAttachments($taskId, array $payload)
     {
-        foreach ($payload['Attachments'] as $attachment) {
-            $this->taskFileModel->uploadContent($taskId, $attachment['Name'], $attachment['Content']);
+        if (! empty($payload['Attachments'])) {
+            foreach ($payload['Attachments'] as $attachment) {
+                $this->taskFileModel->uploadContent($taskId, $attachment['Name'], $attachment['Content']);
+            }
         }
     }
 }
