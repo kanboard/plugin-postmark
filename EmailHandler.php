@@ -132,14 +132,7 @@ class EmailHandler extends Base implements ClientInterface
                 'remove_nodes' => 'meta script style link img span',
             ));
 
-            $markdown = $htmlConverter->convert($payload['HtmlBody']);
-
-            // Document parsed incorrectly
-            if (strpos($markdown, 'html') !== false && ! empty($payload['TextBody'])) {
-                return $payload['TextBody'];
-            }
-
-            return $markdown;
+            return $htmlConverter->convert($payload['HtmlBody']);
         } elseif (! empty($payload['TextBody'])) {
             return $payload['TextBody'];
         }
