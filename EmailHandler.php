@@ -35,13 +35,14 @@ class EmailHandler extends Base implements ClientInterface
      * Send a HTML email
      *
      * @access public
-     * @param  string  $email
-     * @param  string  $name
+     * @param  string  $recipientEmail
+     * @param  string  $recipientName
      * @param  string  $subject
      * @param  string  $html
-     * @param  string  $author
+     * @param  string  $authorName
+     * @param  string  $authorEmail
      */
-    public function sendEmail($email, $name, $subject, $html, $author)
+    public function sendEmail($recipientEmail, $recipientName, $subject, $html, $authorName, $authorEmail = '')
     {
         $headers = array(
             'Accept: application/json',
@@ -49,11 +50,15 @@ class EmailHandler extends Base implements ClientInterface
         );
 
         $payload = array(
-            'From' => sprintf('%s <%s>', $author, $this->helper->mail->getMailSenderAddress()),
-            'To' => sprintf('%s <%s>', $name, $email),
+            'From' => sprintf('%s <%s>', $authorName, $this->helper->mail->getMailSenderAddress()),
+            'To' => sprintf('%s <%s>', $recipientName, $recipientEmail),
             'Subject' => $subject,
             'HtmlBody' => $html,
         );
+
+        if (! empty($authorEmail)) {
+            $payload['ReplyTo'] = $authorEmail;
+        }
 
         $this->httpClient->postJsonAsync('https://api.postmarkapp.com/email', $payload, $headers);
     }
