@@ -5,7 +5,7 @@
     <?= $this->form->label(t('Postmark API token'), 'postmark_api_token') ?>
     <?= $this->form->text('postmark_api_token', $values) ?>
 
-    <p class="form-help"><a href="https://kanboard.net/plugin/postmark" target="_blank"><?= t('Help on Postmark integration') ?></a></p>
+    <p class="form-help"><a href="https://github.com/kanboard/plugin-postmark/blob/master/README.md" target="_blank"><?= t('Help on Postmark integration') ?></a></p>
 
     <div class="form-actions">
         <input type="submit" value="<?= t('Save') ?>" class="btn btn-blue">
